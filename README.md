@@ -26,7 +26,10 @@ source venv/bin/activate
 `sudo python ./http_listener.py`
 
 ### Testing
-To test that http_listener.py is working, test:
+To test that http_listener.py is working, on VM terminal (not in venv) test:
 ```
 wget --method=POST   --header="Content-Type: application/json"   --body-data='{"message":"test"}'   http://172.23.71.167:5000/post   -O -
 ```
+
+### Archive
+- `archive/ingest.py` is not used for our datapipeline, but is maintained in case we want to try a different method in future.
