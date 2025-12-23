@@ -38,7 +38,7 @@ sudo nohup python ./http_listener.py > listener.log 2>&1 &
 Check the server:\
 `ps aux | grep http_listener.py`\
 View logs live:\
-`tail -f listener.log`\
+`tail -f listener.log`
 
 ### Log Management with Cron
 The Flask log file (`listener.log`) can grow over time. It is automatically truncated using a cron job. Setup:
