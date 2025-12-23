@@ -13,12 +13,14 @@ pip install -r requirements.txt
 ```
 
 ### Setup
-A `.env` file in the repository root contains the following information:\
-PGHOST=<hostname> \
-PGDATABASE=<database name> \
-PGUSER=<PostgreSQL username>\
-PGPASSWORD=<PostgreSQL password>\
+A `.env` file in the repository root contains the following information:
+```.env
+PGHOST=<hostname> 
+PGDATABASE=<database name> 
+PGUSER=<PostgreSQL username>
+PGPASSWORD=<PostgreSQL password>
 PGPORT=5432
+```
 
 ### Running the server
 Navigate to the repository and activate the virtual environment:
