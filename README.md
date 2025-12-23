@@ -27,7 +27,7 @@ Navigate to the repository and activate the virtual environment:
 cd Public/src/weather-data-acquisition
 source venv/bin/activate
 ```
-- Run the Flask http listener on port 80 (requires sudo):
+- Run the Flask http listener on port 80 (requires sudo):\
 `sudo python ./http_listener.py`
 
 ### Running in the Background (nohup)
@@ -35,10 +35,10 @@ To keep the server running after logging out:
 ```bash
 sudo nohup python ./http_listener.py > listener.log 2>&1 &
 ```
-Check the server:
-`ps aux | grep http_listener.py`
-View logs live:
-`tail -f listener.log`
+Check the server:\
+`ps aux | grep http_listener.py`\
+View logs live:\
+`tail -f listener.log`\
 
 ### Log Management with Cron
 The Flask log file (`listener.log`) can grow over time. It is automatically truncated using a cron job. Setup:
