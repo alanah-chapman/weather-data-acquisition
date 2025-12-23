@@ -11,19 +11,21 @@ import os
 #   CAMPBELL_USER
 #   CAMPBELL_PASSWORD
 load_dotenv()
+CAMPBELL_USER = os.getenv("CAMPBELL_USER")
+CAMPBELL_PASSWORD = os.getenv("CAMPBELL_PASSWORD")
 
 # ------------------------------------------------------------------
 # Configuration
 # ------------------------------------------------------------------
+LOGGER_IP = "10.100.17.162"
+LOGGER_PORT = 80       # Update if logger uses a different port
+LOGGER_ENDPOINT = "/csapi/"
+POLL_INTERVAL = 10      # seconds
+MAX_RETRIES = 5         # retries per request
+RETRY_DELAY = 5         # seconds between retries
 
-# Campbell internal REST API endpoint
-# - DataQuery        → query table data
-# - most-recent      → always return the newest record
-# - format=json      → machine-readable output
-# - uri=dl:ClimaVue_10Sec → 10-second ClimaVue table
-# - p1=1             → return exactly one record
 URL = (
-    "http://10.100.17.162/csapi/"
+    f"http://{LOGGER_IP}:{LOGGER_PORT}{LOGGER_ENDPOINT}"
     "?command=DataQuery"
     "&mode=most-recent"
     "&format=json"
@@ -31,6 +33,7 @@ URL = (
     "&p1=1"
 )
 
+AUTH = (CAMPBELL_USER, CAMPBELL_PASSWORD)
 # HTTP basic authentication for the logger
 AUTH = (
     os.getenv("CAMPBELL_USER"),
