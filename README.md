@@ -1,7 +1,7 @@
 This repository sets up a data ingestion pipeline for the McCoy building weather station. The logger sends data via HTTP POST every 10 seconds. The VM receives these posts, parses the data using key value pairs, and inserts it into a PostgreSQL database with http_listener.py.
 
 ### Contents
-http_listener.py – The main Flask server that listens for HTTP POSTs from the logger and inserts data into PostgreSQL.
+http_listener.py – The main Flask server that listens for HTTP POSTs from the logger and inserts data into PostgreSQL. \
 requirements.txt – Python dependencies for the project.
 
 ### Prerequisites
