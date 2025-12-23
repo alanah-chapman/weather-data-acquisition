@@ -5,6 +5,8 @@ from flask import Flask, request
 from dotenv import load_dotenv
 import os
 import psycopg2
+import numpy as np
+from datetime import datetime, timezone
 
 # Load .env variables
 load_dotenv()
@@ -13,7 +15,7 @@ PGDATABASE = os.getenv("PGDATABASE")
 PGUSER = os.getenv("PGUSER")
 PGPASSWORD = os.getenv("PGPASSWORD")
 PGPORT = int(os.getenv("PGPORT", 5432))
-TABLE = "setup_test" # target table in PG database 
+TABLE = "weather_10sec" # target table in PG database 
 
 # --------------------------------------------------
 # Flask setup
@@ -50,20 +52,70 @@ DB_COLUMNS = get_table_columns()
 print("DB columns:", DB_COLUMNS)
 
 # --------------------------------------------------
-# Insert row dynamically
+# Map raw data to DB column names
 # --------------------------------------------------
-def insert_row(data: dict):
-    keys = list(data.keys())
-    values = [data[k] for k in keys]
 
-    columns_sql = ", ".join(keys)
-    placeholders = ", ".join(["%s"] * len(values))
+# Cambell Scientific variables: https://help.campbellsci.com/aspen10/aspen/recipes/climavue.htm?tocpath=Recipes%7C_____2
+column_map = {
+    'BattV': 'batt_v',
+    'PTemp_C': 'logger_temp',
+    'SlrFD_W': 'solar_flux_density_wm2',
+    'Rain_mm': 'precipitation',          # raw 'Rain_mm' → table column 'precipitation'
+    'Strikes': 'strikes',
+    'Dist_km': 'dist',
+    'WS_ms': 'wind_speed',
+    'WindDir': 'wind_direction',
+    'MaxWS_ms': 'windspdmax', # wind speed max - 10 sec gust
+    'AirT_C': 'temperature',
+    'VP_mbar': 'vp', # vapor pressure in mbar
+    'BP_mbar': 'atmospheric_pressure',
+    'RH': 'humidity',
+    'RHT_C': 'rhtemp', # internal climavue sensor temp
+    'TiltNS_deg': 'tiltns', # climavue tilt north(+)/south(-) (deg)
+    'TiltWE_deg': 'tiltwe', # climavue tilt west(+)/east(-) (deg)
+    'PrecDropCt': 'precipdrop', 
+    'PrecTipCt': 'preciptip', # rain gauge tip count total
+    'PrecEC': 'precipec', # rain gauge electrical conductivity
+    'SingOrientation': 'tiltxy', # climavue single axis orientation
+    'TMin': 'airtempmin', # deg C
+    'TMax': 'airtempmax', # deg C
+    'SlrTF_MJ': 'cs320_total_energy_mj', # total solar energy in MJ/m2
+    'SlrW': 'cs320_irradiance', # irradiance in W/m2
+    'Raw_mV': 'cs320_vout', # raw output in mV from pyranometer
+    'CS320_Temp': 'cs320_temp', # internal CS320 temperature
+    'CS320_Angle': 'cs320_tilt', # tilt angle of CS320 pyranometer
+    'SlrMJ': 'cs320_energy_mj' # solar energy in MJ/m2 from CS320
+}
 
-    sql = f"""
-        INSERT INTO {TABLE} ({columns_sql})
-        VALUES ({placeholders})
-    """
+def insert_payload(payload):
+    fields = payload.split(",")
+    data = {}
 
+    for f in fields:
+        k, v = f.split("=")
+        if k in column_map:
+            db_col = column_map[k]
+            data[db_col] = float(v)
+
+    # Calculate dewpoint_temperature if vapor_pressure_mbar exists
+    if 'vp' in data:
+        vp = data['vp']
+        val = np.log(vp / 6.112)
+        dewpoint = 243.5 * val / (17.67 - val)  # deg C
+        data['dewpoint_temp'] = float(dewpoint)
+    # Add utc timestamp
+    time_now = datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M:%S')
+    print('utc',time_now)
+    data['timestamp_utc'] = time_now
+
+
+    # Build SQL dynamically
+    cols = ', '.join(data.keys())
+    placeholders = ', '.join(['%s'] * len(data))
+    values = tuple(data.values())
+    query = f"INSERT INTO {TABLE} ({cols}) VALUES ({placeholders})"
+
+    # Insert into database
     conn = psycopg2.connect(
         host=PGHOST,
         dbname=PGDATABASE,
@@ -72,53 +124,23 @@ def insert_row(data: dict):
         port=PGPORT
     )
     cur = conn.cursor()
-    cur.execute(sql, values)
+    cur.execute(query, values)
     conn.commit()
     cur.close()
     conn.close()
 
-# --------------------------------------------------
-# POST endpoint
-# --------------------------------------------------
 @app.route("/post", methods=["POST"])
 def receive_post():
-    print("\n--- POST received from logger ---")
-
     raw = request.data.decode("utf-8").strip()
-    print("Raw payload:", raw)
-
+    print("Received POST:", raw)
     try:
-        parsed = {}
-
-        # Parse key=value pairs
-        for pair in raw.split(","):
-            key, val = pair.split("=")
-            key = key.lower()           # match DB column names
-            parsed[key] = float(val)
-
-        # Only keep columns that exist in DB
-        filtered = {
-            k: v for k, v in parsed.items()
-            if k in DB_COLUMNS
-        }
-
-        if not filtered:
-            raise ValueError("No matching DB columns found")
-
-        insert_row(filtered)
-
-        print("Inserted columns:", filtered.keys())
+        insert_payload(raw)
         return {"status": "ok"}, 200
-
     except Exception as e:
         print("ERROR:", e)
         return {"status": "error", "message": str(e)}, 500
 
-# --------------------------------------------------
-# Run server
-# --------------------------------------------------
 if __name__ == "__main__":
-    print(f"Listening on port {PORT}")
+    print(f"Starting Flask listener on port {PORT}")
     app.run(host="0.0.0.0", port=PORT)
-
 
