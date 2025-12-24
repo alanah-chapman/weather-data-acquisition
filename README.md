@@ -1,8 +1,9 @@
 This repository sets up a data ingestion pipeline for the McCoy building weather station. The logger sends data via HTTP POST every 10 seconds. The VM receives these posts, parses the data using key value pairs, and inserts it into a PostgreSQL database with http_listener.py.
 
 ### Contents
-http_listener.py – The main Flask server that listens for HTTP POSTs from the logger and inserts data into PostgreSQL. \
-requirements.txt – Python dependencies for the project.
+- `http_listener.py` The main Flask server that listens for HTTP POSTs from the logger and inserts data into PostgreSQL. Nohup continues to run this script in the background.
+- `requirements.txt` – Python dependencies for the project.
+- `get_bom_charts.py` - Python script to download mslp and RGB Himawari satellite images from the BoM website, stored in the bom_images folder. coming soon:*A cron job running this script every 6 hours to download the most recent images*
 
 ### Prerequisites
 - Python 3.12+
