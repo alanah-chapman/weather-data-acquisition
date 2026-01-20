@@ -52,6 +52,38 @@ crontab -e
 0 0 * * * > /home/username/Public/src/weather-data-acquisition/listener.log
 ```
 
+"""
+### Daily Aggregation (weather_daily)
+
+We store raw 10-second observations in `weather_10sec`. `weather_daily` is a persistent table with one row per day,
+containing daily summary metrics (means/max/min, counts above/below thresholds, wind direction mean, precipitation
+totals and max 10-min intensity, etc.). This table is populated by SQL scripts in `daily_conversion/`.
+
+#### One-time setup / backfill
+From `daily_conversion/`, run in order:
+
+psql -h localhost -U weather_stats -d weather -f 01_creat_weather_daily_table.sql
+psql -h localhost -U weather_stats -d weather -f 02_backfill_from_weather_regular.sql
+psql -h localhost -U weather_stats -d weather -f 03_backfill_from_weather_10sec_existing.sql
+
+#### Daily cron job (yesterday only)
+This runs once per day shortly after midnight and appends yesterday’s daily row from `weather_10sec`
+into `weather_daily`. It is safe to rerun because `ON CONFLICT (date) DO NOTHING` prevents duplicates.
+
+Install cron:
+
+crontab -e
+
+Add (runs daily at 00:05):
+
+5 0 * * * psql -h localhost -U weather_stats -d weather -f /FULL/PATH/TO/daily_conversion/04_daily_cron_yesterday_weather_10sec.sql
+
+Confirm cron is installed:
+
+crontab -l
+"""
+
+
 ### Testing
 To test that http_listener.py is working, on VM terminal (not in venv) test:
 ```
