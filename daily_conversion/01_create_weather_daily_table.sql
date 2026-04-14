@@ -30,7 +30,6 @@ CREATE TABLE weather_daily (
     precipitation_count integer,
     precipitation_count_gt_0 integer,
     precipitation_intensity_mean double precision,
-    precipitation_max_10min_intensity double precision,
 
     solar_flux_density_wm2_mean double precision,
     solar_flux_density_wm2_max  double precision,
@@ -74,7 +73,6 @@ CREATE TABLE weather_daily (
     wind_speed_count_less_0p5 integer,
     wind_speed_count_gt_2 integer,
     wind_speed_count_gt_8 integer,
-    wind_direction_mean double precision,
 
     vp_mean double precision,
     vp_min  double precision,

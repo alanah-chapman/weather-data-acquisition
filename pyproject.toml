@@ -1,0 +1,15 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "weather-daily-agg"
+version = "0.1.0"
+description = "Shared SQL aggregation template for weather_10sec -> weather_daily daily rollups."
+requires-python = ">=3.9"
+
+[tool.setuptools]
+packages = ["daily_conversion"]
+
+[tool.setuptools.package-data]
+daily_conversion = ["*.sql"]
