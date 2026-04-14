@@ -97,7 +97,7 @@ SOURCES = {
 # ============================================================================
 
 AGGS = {
-    "avg":            {"sql": "AVG({col})",                                 "returns": "double precision"},
+    "avg":{"sql": "AVG({col})","returns": "double precision"},
     "max":            {"sql": "MAX({col})",                                 "returns": "double precision"},
     "min":            {"sql": "MIN({col})",                                 "returns": "double precision"},
     "sum":            {"sql": "SUM({col})",                                 "returns": "double precision"},
@@ -451,6 +451,38 @@ FILE_04_HEADER = (
     f"{AUTOGEN_BANNER}"
 )
 
+def build_sql_ds():
+    pairs = []
+    col_block = ''
+    for variable in VARIABLES:
+        var_name = variable["name"]
+        for agg_spec in variable["aggs"]:
+            suffix = agg_spec[0]
+            agg_name = agg_spec[1]
+            output_name = f"{var_name}_{suffix}"
+            # print(agg_name)
+            if agg_name == "custom":
+                dtype = agg_spec[2]["returns"]
+            else:
+                dtype = AGGS[agg_name]['returns']
+            pair = '  '.join([output_name, dtype])
+            col_block = "\n    ".join([col_block, pair]) + ','
+        col_block = col_block + '\n'
+            # pairs.append(pair)
+            # print(pairs)
+    
+    pairs.extend(['valid_count integer','data_availability double precision'])
+
+    # col_block = ",\n    ".join(pairs)
+
+
+    sql_str = (
+        f"CREATE TABLE weather_daily (\n"
+        "    date date PRIMARY KEY,\n"
+        f"    {col_block}\n);"
+    )
+    print(sql_str)
+    return sql_str
 
 FILES_TO_RENDER = {
     "02_backfill_from_weather_regular.sql": {
@@ -474,7 +506,13 @@ FILES_TO_RENDER = {
 }
 
 
+
 def main() -> None:
+    content = build_sql_ds()
+    init_filename = "01_create_weather_daily_table.sql"
+    print(f'Building {init_filename}')
+    (HERE / init_filename).write_text(content)
+
     for filename, cfg in FILES_TO_RENDER.items():
         body = build_insert_sql(cfg["source"], cfg["where_clause"])
         content = f"{cfg['header']}\n{body}\n"
