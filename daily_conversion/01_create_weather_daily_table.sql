@@ -1,10 +1,7 @@
 CREATE TABLE weather_daily (
-    date date PRIMARY KEY,
-    
-    atmospheric_pressure_mean  double precision,
+    date date PRIMARY KEY    atmospheric_pressure_mean  double precision,
     atmospheric_pressure_max  double precision,
     atmospheric_pressure_min  double precision,
-
     cs320_irradiance_mean  double precision,
     cs320_irradiance_max  double precision,
     cs320_irradiance_min  double precision,
@@ -12,24 +9,18 @@ CREATE TABLE weather_daily (
     cs320_irradiance_count_gt_5  integer,
     cs320_irradiance_gt_5_mean  double precision,
     cs320_irradiance_bright_count  integer,
-
     dewpoint_temp_min  double precision,
     dewpoint_temp_max  double precision,
     dewpoint_temp_mean  double precision,
-
     dist_min  double precision,
-
     humidity_mean  double precision,
     humidity_min  double precision,
     humidity_max  double precision,
-
     precipdrop_sum  double precision,
-
     precipitation_sum  double precision,
     precipitation_count  integer,
     precipitation_count_gt_0  integer,
     precipitation_intensity_mean  double precision,
-
     solar_flux_density_wm2_mean  double precision,
     solar_flux_density_wm2_max  double precision,
     solar_flux_density_wm2_min  double precision,
@@ -37,7 +28,6 @@ CREATE TABLE weather_daily (
     solar_flux_density_wm2_count_gt_5  integer,
     solar_flux_density_wm2_gt_5_mean  double precision,
     solar_flux_density_wm2_bright_count  integer,
-
     uvb_radiation_mean  double precision,
     uvb_radiation_max  double precision,
     uvb_radiation_min  double precision,
@@ -45,7 +35,6 @@ CREATE TABLE weather_daily (
     uvb_radiation_count_gt_5  integer,
     uvb_radiation_gt_5_mean  double precision,
     uvb_radiation_bright_count  integer,
-
     uva_radiation_mean  double precision,
     uva_radiation_max  double precision,
     uva_radiation_min  double precision,
@@ -53,9 +42,7 @@ CREATE TABLE weather_daily (
     uva_radiation_count_gt_5  integer,
     uva_radiation_gt_5_mean  double precision,
     uva_radiation_bright_count  integer,
-
     strikes_sum  double precision,
-
     temperature_min  double precision,
     temperature_max  double precision,
     temperature_mean  double precision,
@@ -65,16 +52,15 @@ CREATE TABLE weather_daily (
     temperature_count_above_30  integer,
     temperature_count_above_35  integer,
     temperature_count_above_40  integer,
-
     wind_speed_min  double precision,
     wind_speed_max  double precision,
     wind_speed_mean  double precision,
     wind_speed_count_gt_14  integer,
     wind_speed_count_gt_21  integer,
-
     vp_mean  double precision,
     vp_min  double precision,
     vp_max  double precision,
     vp_diurnal_range  double precision,
-
+    valid_count integer,
+    data_availability double precision
 );

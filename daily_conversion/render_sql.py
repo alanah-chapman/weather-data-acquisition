@@ -453,35 +453,36 @@ FILE_04_HEADER = (
 
 def build_sql_ds():
     pairs = []
-    col_block = ''
+
     for variable in VARIABLES:
         var_name = variable["name"]
         for agg_spec in variable["aggs"]:
             suffix = agg_spec[0]
             agg_name = agg_spec[1]
             output_name = f"{var_name}_{suffix}"
-            # print(agg_name)
+
             if agg_name == "custom":
                 dtype = agg_spec[2]["returns"]
             else:
                 dtype = AGGS[agg_name]['returns']
-            pair = '  '.join([output_name, dtype])
-            col_block = "\n    ".join([col_block, pair]) + ','
-        col_block = col_block + '\n'
+
+            pair = f"{output_name}  {dtype}"
+            pairs.append(pair)
+
             # pairs.append(pair)
             # print(pairs)
-    
+
     pairs.extend(['valid_count integer','data_availability double precision'])
 
-    # col_block = ",\n    ".join(pairs)
+    col_block = ",\n    ".join(pairs)
 
 
     sql_str = (
         f"CREATE TABLE weather_daily (\n"
-        "    date date PRIMARY KEY,\n"
+        "    date date PRIMARY KEY"
         f"    {col_block}\n);"
     )
-    print(sql_str)
+    # print(sql_str)
     return sql_str
 
 FILES_TO_RENDER = {
