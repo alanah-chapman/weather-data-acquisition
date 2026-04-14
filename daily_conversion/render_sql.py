@@ -479,7 +479,7 @@ def build_sql_ds():
 
     sql_str = (
         f"CREATE TABLE weather_daily (\n"
-        "    date date PRIMARY KEY"
+        "    date date PRIMARY KEY,\n"
         f"    {col_block}\n);"
     )
     # print(sql_str)

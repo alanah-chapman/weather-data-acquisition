@@ -1,5 +1,6 @@
 CREATE TABLE weather_daily (
-    date date PRIMARY KEY    atmospheric_pressure_mean  double precision,
+    date date PRIMARY KEY,
+    atmospheric_pressure_mean  double precision,
     atmospheric_pressure_max  double precision,
     atmospheric_pressure_min  double precision,
     cs320_irradiance_mean  double precision,
