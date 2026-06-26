@@ -84,7 +84,11 @@ column_map = {
     'Raw_mV': 'cs320_vout', # raw output in mV from pyranometer
     'CS320_Temp': 'cs320_temp', # internal CS320 temperature
     'CS320_Angle': 'cs320_tilt', # tilt angle of CS320 pyranometer
-    'SlrMJ': 'cs320_energy_mj' # solar energy in MJ/m2 from CS320
+    'SlrMJ': 'cs320_energy_mj', # solar energy in MJ/m2 from CS320
+    'PAR_Den':'par_den', # photosynthetically active radiation density in μmol/m2/s??
+    'PAR_Tot':'par_tot', # photosynthetically active radiation total in μmol/m2??
+    'PAR_Den_2':'par_den_2', # UVA radiation density in μmol/m2/s
+    'PAR_Tot_2':'par_tot_2', # UVA radiation total in μmol/m2??
 }
 
 def insert_payload(payload):
