@@ -1,9 +1,9 @@
 This repository sets up a data ingestion pipeline for the McCoy building weather station. The logger sends data via HTTP POST every 10 seconds. The VM receives these posts, parses the data using key value pairs, and inserts it into a PostgreSQL database with http_listener.py.
 
 ### Contents
-- `http_listener.py` The main Flask server that listens for HTTP POSTs from the logger and inserts data into PostgreSQL. Nohup continues to run this script in the background.
+- `http_listener.py` The main Gunicorn server (prod version of Flask) that listens for HTTP POSTs from the logger and inserts data into PostgreSQL. Nohup continues to run this script in the background.
 - `requirements.txt` – Python dependencies for the project.
-- `get_bom_charts.py` - Python script to download mslp and RGB Himawari satellite images from the BoM website, stored in the bom_images folder. coming soon:*A cron job running this script every 6 hours to download the most recent images*
+- `/daily_conversion` - Converts 10sec data to daily averages, adding data to the weather_daily table in the PostgreSQL database.
 
 ### Prerequisites
 - Python 3.12+
@@ -25,21 +25,22 @@ PGPORT=5432
 ### Running the server
 Navigate to the repository and activate the virtual environment:
 ```bash
-cd Public/src/weather-data-acquisition
+cd /srv/shared/weather-data-acquisition
 source venv/bin/activate
 ```
-- Run the Flask http listener on port 80 (requires sudo):\
+- Run the Gunicorn http listener on port 80 (requires sudo):\
 `sudo python ./http_listener.py`
 
 ### Running in the Background (nohup)
 To keep the server running after logging out:
 ```bash
-sudo nohup python ./http_listener.py > listener.log 2>&1 &
+sudo nohup gunicorn -w 4 -b 0.0.0.0:80 http_listener:app > /srv/shared/weather-data-acquisition/listener.log 2>&1 &
 ```
 Check the server:\
 `ps aux | grep http_listener.py`\
 View logs live:\
-`tail -f listener.log`
+`tail -f listener.log`\
+To kill process (and then rerun sudo line above): `sudo pkill -f gunicorn`
 
 ### Log Management with Cron
 The Flask log file (`listener.log`) can grow over time. It is automatically truncated using a cron job. Setup:
